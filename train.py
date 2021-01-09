@@ -7,10 +7,45 @@ from utils import StopWatch
 import nn_util
 
 from MIDI_nn import MidiRNN
+import matplotlib.pyplot as plt
 
 import numpy as np
 import math
 
+
+def validate_network(showError = False):
+
+    # making a list of all the batch number which belong to the testing groups
+    test_list = [x for x in range(total_train,total_train+total_test)]
+    loss_by_batch = []
+
+    # setting the network t evaluation
+    net.eval()
+
+    # iterate through the testing bacthes
+    for i in range(total_train,total_train + total_test - input_size - 1):
+
+        # set loss to to zero after each batch iteration
+        loss = 0
+
+        # get the needed input and actual output values 
+        input_matrix = torch.FloatTensor(all_feature_matrix[i:i + input_size]).to(device)
+        val_output = torch.FloatTensor(np.array(all_feature_matrix[i+input_size+1])).to(device)
+
+        # get the network output
+        nn_output = net(input_matrix)
+
+        # check the network output and add the loss
+        loss += loss_function(nn_output, val_output)
+
+        # add the loss to a list which contains loss for all batches
+        loss_by_batch.append(loss)
+
+    # plot the graph of the batch loss as a line graph
+    if showError:
+        plt.plot(loss_by_batch)
+        plt.ylabel('Loss by batch')
+        plt.show()
 
 # load config files
 config = nn_util.load_config()
@@ -28,9 +63,9 @@ training_per = 0.9
 start_epoch = config['start_epoch']
 
 # load a checkpoint
-load = False
+load = True
 save_checkpoint_name = 'heavyRain_pc'
-checkpoint_name = "heavyRain_e400"
+checkpoint_name = "heavyRain_pc_e1"
 
 # get the data
 #read the fetures if not in memeory
@@ -57,7 +92,7 @@ loss_function = nn.MSELoss()
 watch = StopWatch()
 
 if load:
-    net, optimizer, start_epoch, loss, config = load_checkpoint(net,optimizer,checkpoint_name)
+    net, optimizer, start_epoch, loss, config = nn_util.load_checkpoint(net,optimizer,checkpoint_name)
     start_epoch = start_epoch + 1
 
 # loop for all the epochs
@@ -102,41 +137,7 @@ for epoch in range(start_epoch,epochs):
 
     # after a few epochs check with the testing of the network and also generate a song sample
     if (epoch+1) % config['test_network'] == 0:
-        validate_network(True)
-        generate_sample_song(50, f'outputs/heavyRain_e{epoch+1}',saveMIDI = True)
-        save_checkpoint(config,net,optimizer,epoch,loss,checkpoint_name=save_checkpoint_name)
+        validate_network(showError=False)
+        nn_util.generate_sample_song(config, net, all_feature_matrix, device, 50, f'outputs/heavyRain_e{epoch+1}',saveMIDI = True, saveNumpy=False)
+        nn_util.save_checkpoint(net,config,optimizer,epoch,loss,checkpoint_name=save_checkpoint_name)
         net.train()
-
-def validate_network(showError = False):
-
-    # making a list of all the batch number which belong to the testing groups
-    test_list = [x for x in range(total_train,total_train+total_test)]
-    loss_by_batch = []
-
-    # setting the network t evaluation
-    net.eval()
-
-    # iterate through the testing bacthes
-    for i in range(total_train,total_train + total_test - input_size - 1):
-
-        # set loss to to zero after each batch iteration
-        loss = 0
-
-        # get the needed input and actual output values 
-        input_matrix = torch.FloatTensor(all_feature_matrix[i:i + input_size]).to(device)
-        val_output = torch.FloatTensor(np.array(all_feature_matrix[i+input_size+1])).to(device)
-
-        # get the network output
-        nn_output = net(input_matrix)
-
-        # check the network output and add the loss
-        loss += loss_function(nn_output, val_output)
-
-        # add the loss to a list which contains loss for all batches
-        loss_by_batch.append(loss)
-
-    # plot the graph of the batch loss as a line graph
-    if showError:
-        plt.plot(loss_by_batch)
-        plt.ylabel('Loss by batch')
-        plt.show()

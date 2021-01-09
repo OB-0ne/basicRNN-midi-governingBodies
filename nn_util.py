@@ -1,6 +1,8 @@
 import torch
 import matplotlib.pyplot as plt
 import yaml
+import numpy as np
+from DataManager import DataManager
 
 
 def save_checkpoint(net, config, optimizer, epoch_no, loss, checkpoint_name="", store_eNum = True):
@@ -67,60 +69,31 @@ def load_checkpoint_generator(checkpoint_name):
 
     return net, optimizer, epoch_no, loss, config
 
-
-def apply_nn_metaData(nn_meta):
-
-    input_size = nn_meta['input_size']
-    midi_features = nn_meta['midi_features']
-    feature_size = nn_meta['feature_size']
-    hidden_size = nn_meta['hidden_size']
-    output_size = nn_meta['output_size']
-    num_layers = nn_meta['num_layers']
-    dropout_per = nn_meta['dropout_per']
-    learning_rate = nn_meta['learning_rate']
-    batch_size = nn_meta['batch_size']
-
-def update_nn_metaData(config):
-
-    nn_meta = {}
-
-    nn_meta['input_size'] = input_size
-    nn_meta['midi_features'] = midi_features
-    nn_meta['feature_size'] = feature_size
-    nn_meta['hidden_size'] = hidden_size
-    nn_meta['output_size'] = output_size
-    nn_meta['num_layers'] = num_layers
-    nn_meta['dropout_per'] = dropout_per
-    nn_meta['learning_rate'] = learning_rate
-    nn_meta['batch_size'] = batch_size
-
-    return nn_meta
-
-def generate_sample_song(song_length_seconds, song_name = "test_output.wav", showSignal = False, saveMIDI = False, saveNumpy = True, seed = 35):
+def generate_sample_song(config, net, all_feature_matrix, device, song_length_seconds, song_name = "test_output.wav", showSignal = False, saveMIDI = False, saveNumpy = True, seed = 35):
 
     # variables for the song output
     total_iterations = song_length_seconds
 
     # get the features for the seed
-    input_seed = torch.FloatTensor(all_feature_matrix[seed:seed+input_size]).to(device)
+    input_seed = torch.FloatTensor(all_feature_matrix[seed:seed+config['input_size']]).to(device)
 
     # make a zero variable to input the song into
     song = np.zeros((song_length_seconds,4))
-    song[0:input_size] = input_seed.cpu().detach().numpy()
+    song[0:config['input_size']] = input_seed.cpu().detach().numpy()
 
     # set the network to evaluation mode
     net.eval()
 
     # loop through the needed iterations
-    for i in range(total_iterations-input_size):
+    for i in range(total_iterations-config['input_size']):
 
-        input_seed = torch.FloatTensor(song[i:input_size + i]).to(device)
+        input_seed = torch.FloatTensor(song[i:config['input_size'] + i]).to(device)
 
         # get the output from the network
         nn_output = net(input_seed)
 
         # add the current output to the song
-        song[input_size + i] = nn_output.cpu().detach().numpy()
+        song[config['input_size'] + i] = nn_output.cpu().detach().numpy()
 
     if saveNumpy:
         np.save(song_name,np.array(song))

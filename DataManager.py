@@ -11,7 +11,7 @@ class DataManager:
     max_midi_time = 580.0
     AutoTime = 480
     
-    def __init__(self, sFileName):
+    def __init__(self, sFileName=''):
         if Path(sFileName).exists() and sFileName!='':
             self.file_location = sFileName
                         
