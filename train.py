@@ -63,9 +63,9 @@ training_per = 0.9
 start_epoch = config['start_epoch']
 
 # load a checkpoint
-load = False
-save_checkpoint_name = 'heavyRain_pc'
-checkpoint_name = "heavyRain_pc_e1"
+load = config['load_model']
+save_checkpoint_name = config['save_checkpoint_name']
+checkpoint_name = config['load_checkpoint_name']
 
 # get the data
 #read the fetures if not in memeory
@@ -138,6 +138,6 @@ for epoch in range(start_epoch,epochs):
     # after a few epochs check with the testing of the network and also generate a song sample
     if (epoch+1) % config['test_network'] == 0:
         validate_network(showError=False)
-        nn_util.generate_sample_song(config, net, all_feature_matrix, device, 50, f'outputs/heavyRain_e{epoch+1}',saveMIDI = True, saveNumpy=False)
+        #nn_util.generate_sample_song(config, net, all_feature_matrix, device, 50, f'outputs/heavyRain_e{epoch+1}',saveMIDI = True, saveNumpy=False)
         nn_util.save_checkpoint(net,config,optimizer,epoch,loss,checkpoint_name=save_checkpoint_name)
         net.train()

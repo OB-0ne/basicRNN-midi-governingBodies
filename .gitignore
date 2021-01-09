@@ -1,6 +1,6 @@
 .vs/
 .vscode/
-out_data/
+old_data/
 test Project/
 midiTest.npy
 *.als
