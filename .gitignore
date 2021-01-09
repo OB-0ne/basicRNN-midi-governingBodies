@@ -4,3 +4,6 @@ out_data/
 test Project/*
 midiTest.npy
 *.als
+*.pyc
+
+virtual/

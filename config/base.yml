@@ -1,0 +1,6 @@
+input_size: 24
+midi_features: 4
+num_layers: 8
+dropout_per: 0.5
+learning_rate: 0.001
+batch_size: 45

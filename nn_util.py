@@ -1,8 +1,9 @@
 import torch
 import matplotlib.pyplot as plt
+import yaml
 
 
-def save_checkpoint(net, optimizer, epoch_no, loss, checkpoint_name="", store_eNum = True):
+def save_checkpoint(net, config, optimizer, epoch_no, loss, checkpoint_name="", store_eNum = True):
 
     path = "saved_net/"
     if checkpoint_name == "":
@@ -18,7 +19,7 @@ def save_checkpoint(net, optimizer, epoch_no, loss, checkpoint_name="", store_eN
                     'model_state_dict': net.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'loss': loss,
-                    'meta': update_nn_metaData()
+                    'meta': config
                   }
 
     torch.save(checkpoint, path)
@@ -36,9 +37,7 @@ def load_checkpoint(net, optimizer, checkpoint_name, net_evalMode = False):
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch_no = checkpoint['epoch']
     loss = checkpoint['loss']
-    nn_meta = checkpoint['meta']
-
-    apply_nn_metaData(nn_meta)
+    config = checkpoint['meta']
 
     if net_evalMode:
         net.eval()
@@ -47,7 +46,7 @@ def load_checkpoint(net, optimizer, checkpoint_name, net_evalMode = False):
 
     print(f"----- Loaded the network from '{path}' -----")
 
-    return net, optimizer, epoch_no, loss
+    return net, optimizer, epoch_no, loss, config
 
 def load_checkpoint_generator(checkpoint_name):
 
@@ -60,15 +59,13 @@ def load_checkpoint_generator(checkpoint_name):
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch_no = checkpoint['epoch']
     loss = checkpoint['loss']
-    nn_meta = checkpoint['meta']
-
-    apply_nn_metaData(nn_meta)
+    config = checkpoint['meta']
 
     net.eval()
 
     print(f"----- Loaded the network from '{path}' -----")
 
-    return net, optimizer, epoch_no, loss
+    return net, optimizer, epoch_no, loss, config
 
 
 def apply_nn_metaData(nn_meta):
@@ -83,7 +80,7 @@ def apply_nn_metaData(nn_meta):
     learning_rate = nn_meta['learning_rate']
     batch_size = nn_meta['batch_size']
 
-def update_nn_metaData():
+def update_nn_metaData(config):
 
     nn_meta = {}
 
@@ -132,3 +129,26 @@ def generate_sample_song(song_length_seconds, song_name = "test_output.wav", sho
         DM = DataManager()
         DM.np2MIDI(song, song_name,AutoTimed=True)
         
+def load_config(generate_config=False):
+    
+    # gets the basic features for the NN class
+    with open(r'config/base.yml') as file:
+        config = yaml.load(file, Loader=yaml.FullLoader)
+    
+    # gets the setting to generate new MIDI
+    # otherwise will get the trainig information for the network
+    if generate_config:
+        with open(r'config/generation.yml') as file:
+            temp = yaml.load(file, Loader=yaml.FullLoader)
+            config.update(temp)
+    else:
+        with open(r'config/training.yml') as file:
+            temp = yaml.load(file, Loader=yaml.FullLoader)
+            config.update(temp)
+
+    # calculating additional parameters for the NN class
+    config['feature_size'] = config['midi_features'] * config['input_size']
+    config['hidden_size'] = int(config['feature_size']*2.4)
+    config['output_size'] = config['midi_features']
+
+    return config
