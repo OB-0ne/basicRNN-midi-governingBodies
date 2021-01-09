@@ -1,4 +1,4 @@
-epochs: 2000
+epochs: 5000
 training_per: 0.9
-test_network: 20
+test_network: 10
 start_epoch: 0

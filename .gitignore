@@ -1,9 +1,12 @@
 .vs/
 .vscode/
 out_data/
-test Project/*
+test Project/
 midiTest.npy
 *.als
 *.pyc
+
+outputs/*.mid
+outputs/*.npy
 
 virtual/

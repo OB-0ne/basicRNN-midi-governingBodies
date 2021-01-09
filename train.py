@@ -63,7 +63,7 @@ training_per = 0.9
 start_epoch = config['start_epoch']
 
 # load a checkpoint
-load = True
+load = False
 save_checkpoint_name = 'heavyRain_pc'
 checkpoint_name = "heavyRain_pc_e1"
 

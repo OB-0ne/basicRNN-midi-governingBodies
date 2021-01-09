@@ -69,7 +69,7 @@ def load_checkpoint_generator(checkpoint_name):
 
     return net, optimizer, epoch_no, loss, config
 
-def generate_sample_song(config, net, all_feature_matrix, device, song_length_seconds, song_name = "test_output.wav", showSignal = False, saveMIDI = False, saveNumpy = True, seed = 35):
+def generate_sample_song(config, net, all_feature_matrix, device, song_length_seconds, song_name = "test_output.wav", showSignal = False, saveMIDI = False, saveNumpy = True, seed = 35,AutoTimed=True):
 
     # variables for the song output
     total_iterations = song_length_seconds
@@ -100,7 +100,7 @@ def generate_sample_song(config, net, all_feature_matrix, device, song_length_se
 
     if saveMIDI:
         DM = DataManager()
-        DM.np2MIDI(song, song_name,AutoTimed=True)
+        DM.np2MIDI(song, song_name,AutoTimed)
         
 def load_config(generate_config=False):
     
