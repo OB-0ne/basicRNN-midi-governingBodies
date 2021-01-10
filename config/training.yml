@@ -1,6 +1,6 @@
 epochs: 2000
 training_per: 0.9
-test_network: 50
+test_network: 20
 start_epoch: 0
 load_model: False
 load_checkpoint_name: 'heavyRain_pc_e40'
