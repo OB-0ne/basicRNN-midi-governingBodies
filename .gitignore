@@ -6,7 +6,8 @@ midiTest.npy
 *.als
 *.pyc
 
-outputs/*.mid
-outputs/*.npy
+outputs/**/*.mid
+outputs/**/*.npy
+saved_net/**/*.pt
 
 virtual/

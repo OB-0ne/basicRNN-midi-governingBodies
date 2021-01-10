@@ -69,7 +69,7 @@ checkpoint_name = config['load_checkpoint_name']
 
 # get the data
 #read the fetures if not in memeory
-all_feature_matrix = np.load("data/heavyRain.npy")
+all_feature_matrix = np.load("data/heavyRain_improv.npy")
 print("MIDI Reading Completed!")
 print("Shape of the features: ", all_feature_matrix.shape)
 

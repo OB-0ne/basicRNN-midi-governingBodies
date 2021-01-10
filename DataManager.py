@@ -60,6 +60,18 @@ class DataManager:
         np.save(sFilename,np.array(self.mid_npy))
     
     
+    def convert127(self, msg):
+            note = int(msg*127)
+            note = min(note,127)
+            note = max(note,0)
+
+            return note
+
+    def convertTime(self, msg):
+        time_out = abs(int(msg*self.max_midi_time))
+        time_out = int(min(time_out, self.max_midi_time))
+        return time_out
+
     ### OLD CODE ###
     def npFile2MIDI(self, in_filename, out_filename, num = 4, den = 4, clocks = 36, noted32 = 8, AutoTimed = False, AutoTime=120):
             
@@ -79,18 +91,6 @@ class DataManager:
         track.append(mido.MetaMessage('time_signature', numerator=num, denominator=den, clocks_per_click=clocks, notated_32nd_notes_per_beat=noted32, time=0))
         test=[]
 
-        def convert127(msg):
-            note = int(msg*127)
-            note = min(note,127)
-            note = max(note,0)
-
-            return note
-
-        def convertTime(msg):
-            time_out = abs(int(msg*max_midi_time))
-            time_out = int(min(time_out, max_midi_time))
-            return time_out
-
         for msg in data:
 
             if int(msg[0]+0.5) == 1:
@@ -99,10 +99,10 @@ class DataManager:
                 control = 'note_off'
             
             if AutoTimed:
-                track.append(mido.Message(control, note=convert127(msg[1]), velocity=convert127(msg[2]), time=AutoTime))
+                track.append(mido.Message(control, note=self.convert127(msg[1]), velocity=self.convert127(msg[2]), time=AutoTime))
                 
             else:
-                track.append(mido.Message(control, note=convert127(msg[1]), velocity=convert127(msg[2]), time=convertTime(msg[3])))
+                track.append(mido.Message(control, note=self.convert127(msg[1]), velocity=self.convert127(msg[2]), time=self.convertTime(msg[3])))
 
         
         if not out_filename[-4] == '.mid':
@@ -136,10 +136,10 @@ class DataManager:
                 control = 'note_off'
             
             if AutoTimed:
-                track.append(mido.Message(control, note=int(msg[1]*127), velocity=int(msg[2]*127), time=AutoTime))
+                track.append(mido.Message(control, note=self.convert127(msg[1]), velocity=self.convert127(msg[2]), time=AutoTime))
                 
             else:
-                track.append(mido.Message(control, note=int(msg[1]*127), velocity=int(msg[2]*127), time=int(msg[3]*max_midi_time)))
+                track.append(mido.Message(control, note=self.convert127(msg[1]), velocity=self.convert127(msg[2]), time=self.convertTime(msg[3])))
 
         if not out_filename[-4] == '.mid':
             out_filename += '.mid'

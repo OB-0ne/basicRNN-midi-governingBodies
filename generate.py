@@ -34,5 +34,5 @@ watch = StopWatch()
 net, _, _, _, config = nn_util.load_checkpoint(net,optimizer,checkpoint_name,net_evalMode = True)
 
 for i in range(total_samples):
-    nn_util.generate_sample_song(config, net, all_feature_matrix, device, sample_MIDI_size, f'outputs/heavyRain_{(i+1):02d}',saveMIDI=True, saveNumpy=False, seed=random.randint(0, total_seeds), AutoTimed=True)
+    nn_util.generate_sample_song(config, net, all_feature_matrix, device, sample_MIDI_size, f'outputs/heavyRain_{(i+1):02d}',saveMIDI=True, saveNumpy=False, seed=random.randint(0, total_seeds), AutoTimed=False)
     print(f'{watch.give()} heavyRain_{(i+1):02d} generated')
